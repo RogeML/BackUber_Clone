@@ -1,10 +1,15 @@
 const express = require('express');
+const RidesService = require('../services/rides')
+
 function ridesApi(app) {
     const router = express.Router();
     app.use('/api/rides', router);
+
+    const ridesService = new RidesService();
+
     router.get('/', async function(req, res, next) {
         try {
-            const rides = await Promise.resolve([{ride:'example'}]);
+            const rides = await ridesService.getRides();
             res.status(200).json({
                 data: rides,
                 message: 'rides listed'
@@ -14,8 +19,9 @@ function ridesApi(app) {
         }
     })
     router.get('/:rideId', async function(req, res, next) {
+        const { rideId } = req.params;
         try {
-            const createRideId = await Promise.resolve([{id:'1'}]);
+            const createRideId = await ridesService.getRide({ rideId });
             res.status(200).json({
                 data: createRideId,
                 message: 'ride listed'
@@ -25,8 +31,10 @@ function ridesApi(app) {
         }
     })
     router.post('/', async function(req, res, next) {
+        console.log('==================>', req)
+        const { body: ride } = req
         try {
-            const rides = await Promise.resolve([{ride:'1'}]);
+            const rides = await ridesService.createRide({ride});
             res.status(201).json({
                 data: rides,
                 message: 'ride created'
@@ -35,9 +43,14 @@ function ridesApi(app) {
             next(err)
         }
     })
-    router.put('/:movieId', async function(req, res, next) {
+    router.put('/:rideId', async function(req, res, next) {
+        const { rideId } = req.params;
+        const { body: ride } = req
         try {
-            const updatedRideId = await Promise.resolve([{id:'1'}]);
+            const updatedRideId = await ridesService.updateRide({
+                rideId,
+                ride
+            });
             res.status(200).json({
                 data: updatedRideId,
                 message: 'ride listed'
@@ -46,9 +59,10 @@ function ridesApi(app) {
             next(err)
         }
     })
-    router.delete('/:movieId', async function(req, res, next) {
+    router.delete('/:rideId', async function(req, res, next) {
+        const { rideId } = req.params;
         try {
-            const deletedRideId = await Promise.resolve([{id:'1'}]);
+            const deletedRideId = await ridesService.deleteRide({ rideId });
             res.status(200).json({
                 data: deletedRideId,
                 message: 'ride listed'
